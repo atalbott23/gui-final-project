@@ -14,6 +14,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -39,7 +41,11 @@ public class memChess extends Application
 	HBox player2Pink;//Stores the selected pegs in an ordered position
 	StackPane board;//Board where pegs are
 	Color curRoll;// To store current roll to check against peg
-
+	Rectangle diceBox;
+	Text messageBoard;
+	Integer finds = 0;
+	Integer wrongs = 0;
+	boolean turn;
 
 	public static void main( String[] args )
 	{ launch(args); }
@@ -55,6 +61,9 @@ public class memChess extends Application
 		player2 = new VBox();
 		board = new StackPane();
 		controlPanel = new AnchorPane();
+		turn = true; //Testing with it turned on, but will be turned off
+		messageBoard = new Text("Welcome lets test your memory!");
+		messageBoard.setFont(Font.font("Verdana", FontWeight.BOLD, 18));
 
 		setUp();
 		root.setCenter(board);
@@ -71,6 +80,7 @@ public class memChess extends Application
 		drawBoard();
 		dice();
 		controls();
+		updateScore();
 	}
 
 	public void drawBoard()
@@ -139,86 +149,133 @@ public class memChess extends Application
 			(  MouseEvent.MOUSE_CLICKED,
 					(MouseEvent m )->
 			{
-				if(!spot.getFound())
+				if(turn)
 				{
-					Color c = spot.getBottom();
-					spot.setSpot(c);
-					if(c == curRoll)
+					if(!spot.getFound())
 					{
-						System.out.println("found one");
-						
-					}
-					else
-					{
-						System.out.println("Nope");
+						Color c = spot.getBottom();
+						spot.setSpot(c);
+						if(c == curRoll)
+						{
+							System.out.println("found one");
+							messageBoard.setText("Found one");
+							finds++;
+							updateScore();
+//							spot.setSpot(Color.BLACK);
+
+						}
+						else
+						{
+							System.out.println("Nope");
+							messageBoard.setText("Not there! Try again!");
+							spot.resetTop();
+							wrongs++;
+							updateScore();
+
+						}
+
+						diceBox.setFill(Color.LAWNGREEN);
 					}
 				}
 
+
+
 			});
+
 			board.getChildren().add(spot);
 		}
+
+		StackPane.setAlignment(messageBoard, Pos.TOP_LEFT);
+		messageBoard.setTranslateY(10);
+		board.getChildren().add(messageBoard);
+
 	}
-	
+
 	public void controls()
 	{
 		Button dif = new Button("Easy Mode");
+		Button single = new Button("Single Player");
+		Button multi = new Button("Multiplayer");
 		AnchorPane.setLeftAnchor(dif, 400.0);
 		AnchorPane.setRightAnchor(dif, 400.0);
 		AnchorPane.setTopAnchor(dif, 20.0);
-		controlPanel.getChildren().add(dif);
+		AnchorPane.setLeftAnchor(single, 20.0);
+		AnchorPane.setTopAnchor(single, 20.0);
+		AnchorPane.setRightAnchor(multi, 20.0);
+		AnchorPane.setTopAnchor(multi, 20.0);
+		controlPanel.getChildren().addAll(dif,single,multi);
 		controlPanel.setPadding(new Insets(20, 0, 20,0));
 	}
-	
-	
+
+
 	public void dice()
 	{
-		Rectangle box = new Rectangle(100,100);
-		box.setStroke(Color.BLACK);
-		box.setStrokeWidth(3);
-		box.setFill(Color.AQUA);
+		diceBox = new Rectangle(100,100);
+		diceBox.setStroke(Color.BLACK);
+		diceBox.setStrokeWidth(3);
+		diceBox.setFill(Color.LAWNGREEN);
 		Die die = new Die();
 		die.addEventHandler
 		(  MouseEvent.MOUSE_CLICKED,
 				(MouseEvent m )->
 		{
-//			Dice.getRandomRoll();
-			if(Dice.getRandomRoll() == Dice.RED)
+			if(diceBox.getFill() != Color.RED)
 			{
-				die.setDie(Color.RED);
-				curRoll = die.getDie();
-			}
-			else if(Dice.getRandomRoll() == Dice.BLUE)
-			{
-				die.setDie(Color.BLUE);
-				curRoll = die.getDie();
-			}
-			else if(Dice.getRandomRoll() == Dice.YELLOW)
-			{
-				die.setDie(Color.YELLOW);
-				curRoll = die.getDie();
-			}
-			else if(Dice.getRandomRoll() == Dice.GREEN)
-			{
-				die.setDie(Color.GREEN);
-				curRoll = die.getDie();
-			}
-			else if(Dice.getRandomRoll() == Dice.ORANGE)
-			{
-				die.setDie(Color.ORANGE);
-				curRoll = die.getDie();
+				diceBox.setFill(Color.RED);
+				int sleeptime = (int)(Math.random()*1000);;
+				try { Thread.sleep(sleeptime);}
+				catch(Exception e) {}
+
+
+				if(Dice.getRandomRoll() == Dice.RED)
+				{
+					die.setDie(Color.RED);
+					curRoll = die.getDie();
+				}
+				else if(Dice.getRandomRoll() == Dice.BLUE)
+				{
+					die.setDie(Color.BLUE);
+					curRoll = die.getDie();
+				}
+				else if(Dice.getRandomRoll() == Dice.YELLOW)
+				{
+					die.setDie(Color.YELLOW);
+					curRoll = die.getDie();
+				}
+				else if(Dice.getRandomRoll() == Dice.GREEN)
+				{
+					die.setDie(Color.GREEN);
+					curRoll = die.getDie();
+				}
+				else if(Dice.getRandomRoll() == Dice.ORANGE)
+				{
+					die.setDie(Color.ORANGE);
+					curRoll = die.getDie();
+				}
+				else
+				{
+					die.setDie(Color.DEEPPINK);
+					curRoll = die.getDie();
+				}
 			}
 			else
 			{
-				die.setDie(Color.DEEPPINK);
-				curRoll = die.getDie();
+				System.out.println("Need to select a peg now");
 			}
-			
-			
+
+
 
 		});
-		StackPane.setAlignment(box, Pos.TOP_RIGHT);
+		StackPane.setAlignment(diceBox, Pos.TOP_RIGHT);
 		StackPane.setAlignment(die, Pos.TOP_RIGHT);
-		board.getChildren().addAll(box, die);
+
+		Text rollHere = new Text("Click the die to roll");
+		rollHere.setTranslateX(-3);
+		rollHere.setTranslateY(105);
+		rollHere.setFont(Font.font("Verdana", FontWeight.BOLD, 9.5));
+		StackPane.setAlignment(rollHere, Pos.TOP_RIGHT);
+
+		board.getChildren().addAll(diceBox, die, rollHere);
 	}
 
 
@@ -307,6 +364,24 @@ public class memChess extends Application
 		player1.setPadding(new Insets(70, 12, 15, 12));
 		player1.setSpacing(20);
 		player1.getChildren().addAll(firstPlayer, player1Red, player1Blue, player1Yellow, player1Green, player1Orange, player1Pink);
+		String rights = finds.toString();
+		String wrong = wrongs.toString();
+		
+		Text rightFinds = new Text("Found: " + rights);
+		Text misses = new Text("Misses: " + wrong);
+		player1.getChildren().addAll(rightFinds,misses);
+	}
+	
+	public void updateScore()
+	{
+		player1.getChildren().remove(8);
+		player1.getChildren().remove(7);
+		String rights = finds.toString();
+		String wrong = wrongs.toString();
+		
+		Text rightFinds = new Text("Found: " + rights);
+		Text misses = new Text("Misses: " + wrong);
+		player1.getChildren().addAll(rightFinds,misses);
 	}
 
 	public void drawSide2()
@@ -420,20 +495,21 @@ public class memChess extends Application
 		{
 			setFill(c);
 		}
-		
+
 		public void resetTop()
 		{
 			setFill(Color.GHOSTWHITE);
 		}
 
 	}
-	
+
 	public class Die extends Group
 	{
 		Color cur = Color.YELLOW;
 		Rectangle box;
 		Circle dot;
-		
+
+
 		public Die()
 		{
 			box = new Rectangle(40,40);
@@ -450,21 +526,24 @@ public class memChess extends Application
 			dot.setStrokeWidth(2);
 
 			getChildren().addAll(box,dot);
-			
+
 		}
-		
+
 		public void setDie(Color c)
 		{
+
 			cur = c;
 			dot.setFill(cur);
 		}
-		
+
+
 		public Color getDie()
 		{
 			return cur;
 		}
-		
+
 	}
+
 
 
 }
