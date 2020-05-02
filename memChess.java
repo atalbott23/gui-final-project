@@ -19,6 +19,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.input.*;
 
 public class memChess extends Application
 {
@@ -39,7 +40,7 @@ public class memChess extends Application
 	HBox player2Green;//Stores the selected pegs in an ordered position
 	HBox player1Orange;//Stores the selected pegs in an ordered position
 	HBox player2Orange;//Stores the selected pegs in an ordered position
-	HBox player1Pink;//Stores the selected pegs in an ordered position
+	HBox player1Purple;//Stores the selected pegs in an ordered position
 	HBox player2Pink;//Stores the selected pegs in an ordered position
 	StackPane board;//Board where pegs are
 	Color curRoll;// To store current roll to check against peg
@@ -52,6 +53,12 @@ public class memChess extends Application
 	Driver drive;
 	LinkedList <Peg> outie;//to move the outer pegs
 	LinkedList <Peg> innie;//to move the inner pegs
+	int redFound;
+	int blueFound;
+	int yellowFound;
+	int greenFound;
+	int orangeFound;
+	int purpleFound;
 	boolean turn;
 	boolean gameOn;
 
@@ -74,13 +81,14 @@ public class memChess extends Application
 		color = "N/A";
 		outie = new LinkedList<Peg>();
 		innie = new LinkedList<Peg>();
+
 		messageBoard = new Text("Welcome lets test your memory!");
 		messageBoard.setFont(Font.font("Verdana", FontWeight.BOLD, 18));
 		diceMessage = new Text("Your roll was: ");
 		diceMessage.setFont(Font.font("Verdana", FontWeight.BOLD, 18));
 		lasttime = 0;
 		gameOn = false;
-
+		//Working on for rolloing dice with enter
 
 		setUp();
 		drive = new Driver();
@@ -143,7 +151,7 @@ public class memChess extends Application
 			}
 			else
 			{
-				colArr[i] = Color.DEEPPINK;
+				colArr[i] = Color.MEDIUMPURPLE;
 			}
 
 		}
@@ -179,6 +187,7 @@ public class memChess extends Application
 								finds++;
 								updateScore();
 								spot.setSpot(Color.BLACK);
+								foundColor(spot.getColor());
 								Dot dot = new Dot(c);
 								setDots(spot.getColor(), dot);
 							}
@@ -192,7 +201,7 @@ public class memChess extends Application
 
 							}
 
-							diceBox.setFill(Color.LAWNGREEN);
+							diceBox.setFill(Color.FLORALWHITE);
 							turn = false;
 						}
 					}
@@ -215,7 +224,7 @@ public class memChess extends Application
 		extraControls();
 
 	}
-	
+
 
 	public void extraControls()
 	{
@@ -252,9 +261,9 @@ public class memChess extends Application
 		{
 			color = "Orange";
 		}
-		else if(curRoll == Color.DEEPPINK)
+		else if(curRoll == Color.MEDIUMPURPLE)
 		{
-			color = "Pink";
+			color = "Purple";
 		}
 	}
 
@@ -290,20 +299,39 @@ public class memChess extends Application
 				gameOn = true;
 				single.setText("Restart");
 				board.getChildren().clear();
+				outie.clear();
+				innie.clear();
 				drawBoard();
 				dice();
 				startGame();
+
 			}
 			else
 			{
 				gameOn = true;
 				board.getChildren().clear();
+				outie.clear();
+				innie.clear();
 				drawBoard();
 				dice();
 				startGame();
 			}
 		});
 		Button multi = new Button("Game Rules");
+		
+		multi.addEventHandler
+		(  MouseEvent.MOUSE_CLICKED,
+				(MouseEvent m )->
+		{
+			if(player2.isVisible())
+			{
+				player2.setVisible(false);
+			}
+			else
+			{
+				player2.setVisible(true);
+			}
+		});
 		AnchorPane.setLeftAnchor(dif, 400.0);
 		AnchorPane.setRightAnchor(dif, 400.0);
 		AnchorPane.setTopAnchor(dif, 20.0);
@@ -321,7 +349,7 @@ public class memChess extends Application
 		diceBox = new Rectangle(100,100);
 		diceBox.setStroke(Color.BLACK);
 		diceBox.setStrokeWidth(3);
-		diceBox.setFill(Color.LAWNGREEN);
+		diceBox.setFill(Color.FLORALWHITE);
 		Die die = new Die();
 		die.addEventHandler
 		(  MouseEvent.MOUSE_CLICKED,
@@ -329,50 +357,7 @@ public class memChess extends Application
 		{
 			if(gameOn)
 			{
-				if(diceBox.getFill() != Color.RED)
-				{
-					diceBox.setFill(Color.RED);
-
-
-					if(Dice.getRandomRoll() == Dice.RED)
-					{
-						die.setDie(Color.RED);
-						curRoll = die.getDie();
-					}
-					else if(Dice.getRandomRoll() == Dice.BLUE)
-					{
-						die.setDie(Color.BLUE);
-						curRoll = die.getDie();
-					}
-					else if(Dice.getRandomRoll() == Dice.YELLOW)
-					{
-						die.setDie(Color.YELLOW);
-						curRoll = die.getDie();
-					}
-					else if(Dice.getRandomRoll() == Dice.GREEN)
-					{
-						die.setDie(Color.GREEN);
-						curRoll = die.getDie();
-					}
-					else if(Dice.getRandomRoll() == Dice.ORANGE)
-					{
-						die.setDie(Color.ORANGE);
-						curRoll = die.getDie();
-					}
-					else
-					{
-						die.setDie(Color.DEEPPINK);
-						curRoll = die.getDie();
-					}
-				}
-				else
-				{
-					System.out.println("Need to select a peg now");
-				}
-				setColorText();
-				diceMessage.setText("Your roll was: " + color);
-				turn = true;
-
+				rollDie(die);
 			}
 
 		});
@@ -386,9 +371,146 @@ public class memChess extends Application
 		StackPane.setAlignment(rollHere, Pos.TOP_RIGHT);
 
 		board.getChildren().addAll(diceBox, die, rollHere);
+		scene.setOnKeyPressed
+		(  (KeyEvent ke) -> 
+		{
+			if(gameOn)
+			{
+				if (ke.getCode().equals(KeyCode.ENTER))
+				{
+					rollDie(die);
+				}
+			}
+
+		} 
+				);
 	}
-	
-	
+
+	public void rollDie(Die die)
+	{
+
+		if(diceBox.getFill() != Color.BLACK)
+		{
+			if(Dice.getRandomRoll() == Dice.RED)
+			{
+				if(redFound != 4)
+				{
+					die.setDie(Color.RED);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+				}
+				else
+				{
+					while(diceBox.getFill() != Color.RED)
+					{
+						rollDie(die);
+					}				}
+
+
+			}
+			else if(Dice.getRandomRoll() == Dice.BLUE)
+			{
+				if(blueFound != 4)
+				{
+					die.setDie(Color.BLUE);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+				}
+				else
+				{
+					while(diceBox.getFill() != Color.RED)
+					{
+						rollDie(die);
+					}				
+				}
+
+
+			}
+			else if(Dice.getRandomRoll() == Dice.YELLOW)
+			{
+				if(yellowFound != 4)
+				{
+
+					die.setDie(Color.YELLOW);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+				}
+				else
+				{
+					while(diceBox.getFill() != Color.RED)
+					{
+						rollDie(die);
+					}
+				}
+
+
+			}
+			else if(Dice.getRandomRoll() == Dice.GREEN)
+			{
+				if(greenFound != 4)
+				{
+					die.setDie(Color.GREEN);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+				}
+				else
+				{
+					while(diceBox.getFill() != Color.RED)
+					{
+						rollDie(die);
+					}				
+				}
+
+
+			}
+			else if(Dice.getRandomRoll() == Dice.ORANGE)
+			{
+				if(orangeFound != 4)
+				{
+					die.setDie(Color.ORANGE);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+				}
+				else
+				{
+					while(diceBox.getFill() != Color.RED)
+					{
+						rollDie(die);
+					}
+				}
+
+			}
+			else if(Dice.getRandomRoll() == Dice.PURPLE)
+			{
+				if(purpleFound != 4)
+				{
+					die.setDie(Color.MEDIUMPURPLE);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+				}
+				else
+				{
+					while(diceBox.getFill() != Color.RED)
+					{
+						rollDie(die);
+					}
+				}
+
+
+			}
+		}
+		else
+		{
+			System.out.println("Need to select a peg now");
+		}
+		setColorText();
+		diceMessage.setText("Your roll was: " + color);
+		turn = true;
+
+	}
+
+
+
 	public void setDots(String c,Dot d)
 	{
 		if(c == "Red")
@@ -415,9 +537,9 @@ public class memChess extends Application
 			player1Orange.getChildren().add(d);
 
 		}
-		else if(c == "Pink")
+		else if(c == "Purple")
 		{
-			player1Pink.getChildren().add(d);
+			player1Purple.getChildren().add(d);
 		}
 	}
 
@@ -430,7 +552,7 @@ public class memChess extends Application
 		YELLOW, 
 		GREEN, 
 		ORANGE,
-		PINK;
+		PURPLE;
 
 		public static Dice getRandomRoll() {
 			Random random = new Random();
@@ -463,27 +585,27 @@ public class memChess extends Application
 		player1Yellow = new HBox();
 		player1Green = new HBox();
 		player1Orange = new HBox();
-		player1Pink = new HBox();
+		player1Purple = new HBox();
 
 		player1Red.setSpacing(5);
 		player1Blue.setSpacing(5);
 		player1Yellow.setSpacing(5);
 		player1Green.setSpacing(5);
 		player1Orange.setSpacing(5);
-		player1Pink.setSpacing(5);
+		player1Purple.setSpacing(5);
 
 		Text redScore = new Text("Red's: ");
 		Text blueScore = new Text("Blue's: ");
 		Text yellowScore = new Text("Yellow's: ");
 		Text greenScore = new Text("Green's: ");
 		Text orangeScore = new Text("Orange's: ");
-		Text pinkScore = new Text("Pink's: ");
+		Text pinkScore = new Text("Purple's: ");
 		player1Red.getChildren().add(redScore);
 		player1Blue.getChildren().add(blueScore);
 		player1Yellow.getChildren().add(yellowScore);
 		player1Green.getChildren().add(greenScore);
 		player1Orange.getChildren().add(orangeScore);
-		player1Pink.getChildren().add(pinkScore);
+		player1Purple.getChildren().add(pinkScore);
 
 		for(int i = 0; i < 4; i++)
 		{
@@ -492,20 +614,20 @@ public class memChess extends Application
 			Dot yellow1 = new Dot(Color.YELLOW);
 			Dot green1 = new Dot(Color.GREEN);
 			Dot orange1 = new Dot(Color.ORANGE);
-			Dot pink1 = new Dot(Color.DEEPPINK);
+			Dot pink1 = new Dot(Color.MEDIUMPURPLE);
 
 			player1Red.getChildren().add(red1);
 			player1Blue.getChildren().add(blue1);;
 			player1Yellow.getChildren().add(yellow1);
 			player1Green.getChildren().add(green1);
 			player1Orange.getChildren().add(orange1);
-			player1Pink.getChildren().add(pink1);
+			player1Purple.getChildren().add(pink1);
 
 		}
 
 		player1.setPadding(new Insets(70, 12, 15, 12));
 		player1.setSpacing(20);
-		player1.getChildren().addAll(firstPlayer, player1Red, player1Blue, player1Yellow, player1Green, player1Orange, player1Pink);
+		player1.getChildren().addAll(firstPlayer, player1Red, player1Blue, player1Yellow, player1Green, player1Orange, player1Purple);
 		String rights = finds.toString();
 		String wrong = wrongs.toString();
 
@@ -516,25 +638,42 @@ public class memChess extends Application
 
 	public void startGame()
 	{				
+		for(Peg p: outie)
+		{
+			p.resetTop();
+		}
+		for(Peg p: innie)
+		{
+			p.resetTop();
+		}
+		redFound = 0;
+		blueFound = 0;
+		yellowFound = 0;
+		greenFound = 0;
+		orangeFound = 0;
+		purpleFound = 0;
+		finds = 0;
+		wrongs = 0;
+
 		player1Red.getChildren().clear();
 		player1Blue.getChildren().clear();
 		player1Yellow.getChildren().clear();
 		player1Green.getChildren().clear();
 		player1Orange.getChildren().clear();
-		player1Pink.getChildren().clear();
+		player1Purple.getChildren().clear();
 
 		Text redScore = new Text("Red's: ");
 		Text blueScore = new Text("Blue's: ");
 		Text yellowScore = new Text("Yellow's: ");
 		Text greenScore = new Text("Green's: ");
 		Text orangeScore = new Text("Orange's: ");
-		Text pinkScore = new Text("Pink's: ");
+		Text pinkScore = new Text("Purple's: ");
 		player1Red.getChildren().add(redScore);
 		player1Blue.getChildren().add(blueScore);
 		player1Yellow.getChildren().add(yellowScore);
 		player1Green.getChildren().add(greenScore);
 		player1Orange.getChildren().add(orangeScore);
-		player1Pink.getChildren().add(pinkScore);
+		player1Purple.getChildren().add(pinkScore);
 	}
 
 	public void updateScore()
@@ -547,62 +686,84 @@ public class memChess extends Application
 		Text rightFinds = new Text("Found: " + rights);
 		Text misses = new Text("Misses: " + wrong);
 		player1.getChildren().addAll(rightFinds,misses);
-		
+
+	}
+
+	public void  foundColor(String c)
+	{
+		if(c == "Red")
+		{
+			redFound++;
+			System.out.println("Red=" + redFound);
+		}
+		else if(c == "Yellow")
+		{
+			yellowFound++;
+			System.out.println("Yellow=" + yellowFound);
+		}
+		else if(c == "Blue")
+		{
+			blueFound++;
+			System.out.println("Blue=" + blueFound);
+		}
+		else if(c == "Green")
+		{
+			greenFound++;
+			System.out.println("Green=" + greenFound);
+
+		}
+		else if(c == "Orange")
+		{
+			orangeFound++;
+			System.out.println("Orange=" + orangeFound);
+
+		}
+		else if(c == "Purple")
+		{
+			purpleFound++;
+			System.out.println("Purple=" + purpleFound);
+		}
 	}
 
 	public void drawSide2()
 	{
-		Text secondPlayer = new Text("Player 2");
+		Text secondPlayer = new Text("Rules");
+		Text rulesParagraph = new Text("Welcome to your "
+				+ "\nbrain game."
+				+ "\nThis is a memory game "
+				+ "\nthat will test your skills "
+				+ "\nwith two diifculties."
+				+ "\nif you choose to accept "
+				+ "\nthe challenge select"
+				+ "\nstart game and "
+				+ "\nmemorize as much as "
+				+ "\npossible. If you mess up "
+				+ "\ntoo much go ahead "
+				+ "and "
+				+ "\npress restart to wipe "
+				+ "\nthe board anew. "
+				+ "\nRoll the Die in the "
+				+ "\ncorner to choose a "
+				+ "\ncolor to find, you "
+				+ "\ncan also select 'Enter' "
+				+ "\nto roll if that is your "
+				+ "\ngrove."
+				+ "\nTry and solve it in "
+				+ "\nthe least amount of rolls "
+				+ "\nas possible. "
+				+ "\nMost importantly enjoy! \n"
+				+ "Oh, as mentioned if "
+				+ "\nyou're feeling "
+				+ "\nadventours go ahead "
+				+ "\nand take a crack at hard "
+				+ "\nmode by pressing the "
+				+ "\nbottom middle button.");
 
-		player2Red = new HBox();
-		player2Blue = new HBox();
-		player2Yellow = new HBox();
-		player2Green = new HBox();
-		player2Orange = new HBox();
-		player2Pink = new HBox();
-
-		player2Red.setSpacing(5);
-		player2Blue.setSpacing(5);
-		player2Yellow.setSpacing(5);
-		player2Green.setSpacing(5);
-		player2Orange.setSpacing(5);
-		player2Pink.setSpacing(5);
-
-		Text redScore = new Text("Red's: ");
-		Text blueScore = new Text("Blue's: ");
-		Text yellowScore = new Text("Yellow's: ");
-		Text greenScore = new Text("Green's: ");
-		Text orangeScore = new Text("Orange's: ");
-		Text pinkScore = new Text("Pink's: ");
-
-		player2Red.getChildren().add(redScore);
-		player2Blue.getChildren().add(blueScore);
-		player2Yellow.getChildren().add(yellowScore);
-		player2Green.getChildren().add(greenScore);
-		player2Orange.getChildren().add(orangeScore);
-		player2Pink.getChildren().add(pinkScore);
-
-		for(int i = 0; i < 4; i++)
-		{
-			Dot red2 = new Dot(Color.RED);
-			Dot blue2 = new Dot(Color.BLUE);
-			Dot yellow2 = new Dot(Color.YELLOW);
-			Dot green2 = new Dot(Color.GREEN);
-			Dot orange2 = new Dot(Color.ORANGE);
-			Dot pink2 = new Dot(Color.DEEPPINK);
-
-			player2Red.getChildren().add(red2);
-			player2Blue.getChildren().add(blue2);
-			player2Yellow.getChildren().add(yellow2);
-			player2Green.getChildren().add(green2);
-			player2Orange.getChildren().add(orange2);
-			player2Pink.getChildren().add(pink2);
-
-		}
-
+		rulesParagraph.setFont(Font.font("Verdana", 12));
 		player2.setPadding(new Insets(70, 12, 15, 12));
 		player2.setSpacing(20);
-		player2.getChildren().addAll(secondPlayer, player2Red, player2Blue, player2Yellow, player2Green, player2Orange, player2Pink);
+		player2.getChildren().addAll(secondPlayer, rulesParagraph);
+		player2.setVisible(false);
 
 	}
 

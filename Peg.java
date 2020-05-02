@@ -42,9 +42,9 @@ public class Peg extends Circle
 		{
 			bottomName = "Orange";
 		}
-		else if(c == Color.DEEPPINK)
+		else if(c == Color.MEDIUMPURPLE)
 		{
-			bottomName = "Pink";
+			bottomName = "Purple";
 		}
 		
 		degAdd = 0;
