@@ -1,8 +1,6 @@
 package finalProject;
 
-import javafx.animation.FadeTransition;
 import javafx.animation.FillTransition;
-import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
@@ -132,24 +130,6 @@ public class Peg extends Circle
 		
 		return z;
 	}
-	
-//	public double findDegX(double x, double r)
-//	{
-//		
-//		double a = Math.acos(x/r);
-//		double deg = Math.toDegrees(a);
-//		System.out.println(x + "|" + a + "|" + deg);
-//		
-//		return deg;
-//	}
-//	
-//	public double findDegY(double x, double r)
-//	{
-//		double a = Math.asin(x/r);
-//		double deg = Math.toDegrees(a);
-//		
-//		return deg;
-//	}
 	
 	public void setDeg(double d)
 	{
