@@ -8,6 +8,8 @@ import java.util.concurrent.Semaphore;
 import hw06.Ball;
 import hw06.MaxwellAtalbott.Driver;
 import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
@@ -24,6 +26,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 
 public class memChess extends Application
 {
@@ -83,7 +86,7 @@ public class memChess extends Application
 		diceMessage.setFont(Font.font("Verdana", FontWeight.BOLD, 18));
 		lasttime = 0;
 
-		
+
 		setUp();
 		drive = new Driver();
 		root.setCenter(board);
@@ -152,7 +155,7 @@ public class memChess extends Application
 		RandomColor(colArr); //Randomizes colors for peg assignment;
 
 		double[] degPoint = {0, 22.5, 45, 67.5,90,112.5,135,157.5,180,202.5,225,247.5,270,292.5,315,337.5,0,45,90,135,180,225,270,315};
-				
+
 
 		for(int i = 0; i < colArr.length; i ++)
 		{
@@ -177,14 +180,13 @@ public class memChess extends Application
 							messageBoard.setText("You selected a " + spot.getColor() + " peg: Correct!");
 							finds++;
 							updateScore();
-							//							spot.setSpot(Color.BLACK);
-
+							spot.setSpot(Color.BLACK);
 						}
 						else
 						{
 							System.out.println("Nope");
 							messageBoard.setText("You selected a " + spot.getColor() + " peg: Incorrect :(");
-							//							spot.resetTop();
+							spot.resetTop();
 							wrongs++;
 							updateScore();
 
@@ -266,7 +268,7 @@ public class memChess extends Application
 			{
 				dif.setText("Hard Mode");
 				drive.start();
-				
+
 			}
 			else
 			{
@@ -368,7 +370,6 @@ public class memChess extends Application
 		GREEN, 
 		ORANGE,
 		PINK;
-
 
 		public static Dice getRandomRoll() {
 			Random random = new Random();
@@ -576,6 +577,7 @@ public class memChess extends Application
 		{
 			return cur;
 		}
+		
 
 	}
 
@@ -590,12 +592,12 @@ public class memChess extends Application
 			{
 				double deltat = (now-lasttime) * 12.0e-9;//Moves peg at a certain speed 
 				lasttime = now;
-				
+
 				for(Peg p: outie)
 				{
 					p.move(deltat, 250);
 				}
-				
+
 				for(Peg p: innie)
 				{
 					p.move(-deltat, 150);
@@ -604,6 +606,7 @@ public class memChess extends Application
 			}
 
 		}
+		
 
 	}
 

@@ -1,7 +1,11 @@
 package finalProject;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.FillTransition;
+import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 
 
 
@@ -77,12 +81,21 @@ public class Peg extends Circle
 
 	public void setSpot(Color c)
 	{
-		setFill(c);
+		FillTransition fillTransition = new FillTransition(Duration.seconds(3), this);
+		fillTransition.setFromValue(bottomSide);
+		fillTransition.setToValue(c);
+		fillTransition.setCycleCount(1);
+		fillTransition.play();
+		
 	}
 
 	public void resetTop()
 	{
-		setFill(Color.GHOSTWHITE);
+		FillTransition fillTransition = new FillTransition(Duration.seconds(3), this);
+		fillTransition.setFromValue(bottomSide);
+		fillTransition.setToValue(Color.GHOSTWHITE);
+		fillTransition.setCycleCount(1);
+		fillTransition.play();  
 	}
 	
 	public void move(double deltat, double r)
