@@ -41,25 +41,25 @@ public class memChess extends Application
 	HBox player1Purple;//Stores the selected pegs in an ordered position
 	StackPane board;//Board where pegs are
 	Color curRoll;// To store current roll to check against peg
-	Rectangle diceBox;
-	Text messageBoard;
-	Text diceMessage;
-	Integer finds = 0;
-	Integer wrongs = 0;
-	String color;
-	Driver drive;
+	Rectangle diceBox; //outter box of the die mainly for user feed back that they rolled the die
+	Text messageBoard; //Message board that keeps the user informed along the way
+	Text diceMessage; //Tells the user what they rolled
+	Integer finds = 0; //Tallies user correct
+	Integer wrongs = 0; //Tallies user misses
+	String color; //For dice message to change with each user roll
+	Driver drive; //Driver for animation
 	LinkedList <Peg> outie;//to move the outer pegs
 	LinkedList <Peg> innie;//to move the inner pegs
-	int redFound;
-	int blueFound;
-	int yellowFound;
-	int greenFound;
-	int orangeFound;
-	int purpleFound;
-	boolean turn;
-	boolean gameOn;
-	boolean musicOn = false;
-	MediaPlayer mp;
+	int redFound; //keeps track of pegs found
+	int blueFound; //keeps track of pegs found
+	int yellowFound; //keeps track of pegs found
+	int greenFound; //keeps track of pegs found
+	int orangeFound; //keeps track of pegs found
+	int purpleFound; //keeps track of pegs found
+	boolean turn; //for rolling the die to turn it on and off
+	boolean gameOn; //keeps track of game over
+	boolean musicOn = false; //for game over music so it doesnt play forever
+	MediaPlayer mp; //Media player for game over music
 
 
 	public static void main( String[] args )
@@ -76,7 +76,7 @@ public class memChess extends Application
 		player2 = new VBox();
 		board = new StackPane();
 		controlPanel = new AnchorPane();
-		turn = false; //Testing with it turned on, but will be turned off
+		turn = false; 
 		color = "N/A";
 		outie = new LinkedList<Peg>();
 		innie = new LinkedList<Peg>();
@@ -95,10 +95,9 @@ public class memChess extends Application
 		root.setRight(player2);
 		root.setBottom(controlPanel);
 	}
-
+	//Calls each important set up function
 	public void setUp()
 	{
-
 		drawSide1();
 		drawSide2();
 		drawBoard();
@@ -106,7 +105,10 @@ public class memChess extends Application
 		controls();
 		updateScore();
 	}
-
+	//Function drawBoard
+	//Purpose:Draws the entire board an initializes each peg while adding them to the linked list
+	//Parameters:None
+	//Return:None
 	public void drawBoard()
 	{
 		Circle outterCircle = new Circle(400,400,300);
@@ -120,7 +122,6 @@ public class memChess extends Application
 		Circle centerCircle = new Circle(400,400,75);
 		centerCircle.setFill(Color.BLACK);
 		StackPane.setAlignment(outterCircle, Pos.CENTER);
-
 
 		board.getChildren().addAll(outterCircle,innerCircle,centerCircle);
 
@@ -151,13 +152,11 @@ public class memChess extends Application
 			{
 				colArr[i] = Color.MEDIUMPURPLE;
 			}
-
 		}
 		RandomColor(colArr); //Randomizes colors for peg assignment;
-
+		//Holds the initial degrees for both circles
 		double[] degPoint = {0, 22.5, 45, 67.5,90,112.5,135,157.5,180,202.5,225,247.5,270,292.5,315,337.5,0,45,90,135,180,225,270,315};
-
-
+		//Sets up all of the pegs with a Random color assignment
 		for(int i = 0; i < colArr.length; i ++)
 		{
 			Peg spot = new Peg(colArr[i]);
@@ -165,7 +164,8 @@ public class memChess extends Application
 			double cordY = (i <16)?  spot.findNewY(degPoint[i], 250):spot.findNewY(degPoint[i], 125);
 			spot.setDeg(degPoint[i]);
 			spot.setCord(cordX, cordY);
-			spot.addEventHandler
+			
+			spot.addEventHandler//Event Handler That interactes with each peg for their color and properties
 			(  MouseEvent.MOUSE_CLICKED,
 					(MouseEvent m )->
 			{
@@ -203,7 +203,6 @@ public class memChess extends Application
 								updateScore();
 
 							}
-
 							diceBox.setFill(Color.FLORALWHITE);
 							turn = false;
 						}
@@ -211,6 +210,7 @@ public class memChess extends Application
 				}
 
 			});
+			
 			if(i<16)
 			{
 				outie.add(spot);
@@ -219,57 +219,16 @@ public class memChess extends Application
 			{
 				innie.add(spot);
 			}
-
-
 			board.getChildren().add(spot);
 		}
-
+		//Calls Extra Controls
 		extraControls();
 
 	}
-
-	public void gameOver()
-	{
-
-		gameOn =false;
-		for(Peg p: outie)
-		{
-			p.lastCall();
-		}
-		for(Peg p: innie)
-		{
-			p.lastCall();
-		}
-		messageBoard.setText("Congratulations! You have won! Play Again?");
-
-		playAudio("trial.mp3");
-		musicOn = true;
-	}
-
-
-	public void playAudio(String f)
-	{
-		File fsFile = new File( f );
-		String rh = fsFile.toURI().toString();
-		Media m = new Media( rh );
-		mp = new MediaPlayer(m);
-		mp.setVolume(0.5);
-
-		mp.play();
-	}
-
-	public void playClip(String c)
-	{
-		File clip = new File(c);
-		String rH = clip.toURI().toString();
-		System.out.println("reallyHere="+rH);
-		AudioClip soundClip = new AudioClip(rH);
-		soundClip.setVolume(0.7);
-
-		soundClip.play(); 
-	}
-
-
+	//Function extraControls
+	//Purpose:Sets up the message board as well as the dice message
+	//Parameters: None 
+	//Return: None
 	public void extraControls()
 	{
 		StackPane.setAlignment(messageBoard, Pos.TOP_LEFT);
@@ -282,7 +241,59 @@ public class memChess extends Application
 		board.getChildren().addAll(messageBoard, diceMessage);
 
 	}
+	//Function gameOver
+	//Purpose: Ends game with UX effects
+	//Parameters: None
+	//Return: None
+	public void gameOver()
+	{
+		gameOn =false; 
+		board.getChildren().clear();// Had to do this because everytime the game would end there would be random black dots
+		drawBoard();
+		for(Peg p: outie)
+		{
+			p.lastCall();
+		}
+		for(Peg p: innie)
+		{
+			p.lastCall();
+		}
+		messageBoard.setText("Congratulations! You have won! Play Again?");
+		playAudio("trial.mp3");
+		musicOn = true;
+	}
+	//Function playAudio
+	//Purpose: Playing the end game music
+	//Parameters: String for what the file is called
+	//Return: None
+	public void playAudio(String f)
+	{
+		File fsFile = new File( f );
+		String rh = fsFile.toURI().toString();
+		Media m = new Media( rh );
+		mp = new MediaPlayer(m);
+		mp.setVolume(0.5);
 
+		mp.play();
+	}
+	//Function playClip
+	//Purpose: Plays little clips that are for UX
+	//Parameters: String with the file name
+	//Return: None
+	public void playClip(String c)
+	{
+		File clip = new File(c);
+		String rH = clip.toURI().toString();
+		System.out.println("reallyHere="+rH);
+		AudioClip soundClip = new AudioClip(rH);
+		soundClip.setVolume(0.7);
+
+		soundClip.play(); 
+	}
+	//Function setColorText
+	//Purpose: Changes the string of color to update both the dice messsage and the message board 
+	//Parameters: None (Gets input from curRoll a global variable
+	//Return: None
 	public void setColorText()
 	{
 		if(curRoll == Color.RED)
@@ -310,10 +321,13 @@ public class memChess extends Application
 			color = "Purple";
 		}
 	}
-
+	//Function controls
+	//Purpose: Sets up and assigns responsibilites to the control panel at the bottom
+	//Parameters: None
+	//Return: None
 	public void controls()
 	{
-		Button dif = new Button("Easy Mode");
+		Button dif = new Button("Easy Mode"); //Toggles between easy mode and hard mode while starting and stoping the driver
 		System.out.println();
 		dif.addEventHandler
 		(  MouseEvent.MOUSE_CLICKED,
@@ -331,24 +345,23 @@ public class memChess extends Application
 				drive.stop();
 			}
 		});
+		//Starts game while toggling between start and reset
+		Button startGame = new Button("Start Game");
 
-		Button single = new Button("Start Game");
-
-		single.addEventHandler
+		startGame.addEventHandler
 		(  MouseEvent.MOUSE_CLICKED,
 				(MouseEvent m )->
 		{
-			if(single.getText() == "Start Game")
+			if(startGame.getText() == "Start Game")
 			{
 				gameOn = true;
-				single.setText("Restart");
+				startGame.setText("Restart");
 				board.getChildren().clear();
 				outie.clear();
 				innie.clear();
 				drawBoard();
 				dice();
 				startGame();
-
 			}
 			else
 			{
@@ -361,9 +374,10 @@ public class memChess extends Application
 				startGame();
 			}
 		});
-		Button multi = new Button("Game Rules");
+		//Shows and hides the game rules since its kind of wordy
+		Button rules = new Button("Game Rules");
 
-		multi.addEventHandler
+		rules.addEventHandler
 		(  MouseEvent.MOUSE_CLICKED,
 				(MouseEvent m )->
 		{
@@ -376,316 +390,22 @@ public class memChess extends Application
 				player2.setVisible(true);
 			}
 		});
+		
 		AnchorPane.setLeftAnchor(dif, 400.0);
 		AnchorPane.setRightAnchor(dif, 400.0);
 		AnchorPane.setTopAnchor(dif, 20.0);
-		AnchorPane.setLeftAnchor(single, 20.0);
-		AnchorPane.setTopAnchor(single, 20.0);
-		AnchorPane.setRightAnchor(multi, 20.0);
-		AnchorPane.setTopAnchor(multi, 20.0);
-		controlPanel.getChildren().addAll(dif,single,multi);
+		AnchorPane.setLeftAnchor(startGame, 20.0);
+		AnchorPane.setTopAnchor(startGame, 20.0);
+		AnchorPane.setRightAnchor(rules, 20.0);
+		AnchorPane.setTopAnchor(rules, 20.0);
+		controlPanel.getChildren().addAll(dif,startGame,rules);
 		controlPanel.setPadding(new Insets(20, 0, 20,0));
 	}
-
-
-	public void dice()
-	{
-		diceBox = new Rectangle(100,100);
-		diceBox.setStroke(Color.BLACK);
-		diceBox.setStrokeWidth(3);
-		diceBox.setFill(Color.FLORALWHITE);
-		Die die = new Die();
-		die.addEventHandler
-		(  MouseEvent.MOUSE_CLICKED,
-				(MouseEvent m )->
-		{
-			if(gameOn)
-			{
-				rollDie(die);
-			}
-
-		});
-		StackPane.setAlignment(diceBox, Pos.TOP_RIGHT);
-		StackPane.setAlignment(die, Pos.TOP_RIGHT);
-
-		Text rollHere = new Text("Click the die to roll");
-		rollHere.setTranslateX(-3);
-		rollHere.setTranslateY(105);
-		rollHere.setFont(Font.font("Verdana", FontWeight.BOLD, 9.5));
-		StackPane.setAlignment(rollHere, Pos.TOP_RIGHT);
-
-		board.getChildren().addAll(diceBox, die, rollHere);
-		scene.setOnKeyPressed
-		(  (KeyEvent ke) -> 
-		{
-			if(gameOn)
-			{
-				if (ke.getCode().equals(KeyCode.ENTER))
-				{
-					rollDie(die);
-				}
-			}
-
-		} 
-				);
-	}
-
-	public void rollDie(Die die)
-	{
-
-		if(diceBox.getFill() != Color.BLACK)
-		{
-			if(Dice.getRandomRoll() == Dice.RED)
-			{
-				if(redFound != 4)
-				{
-					die.setDie(Color.RED);
-					curRoll = die.getDie();
-					diceBox.setFill(Color.BLACK);
-					playClip("roll.mp3");
-				}
-				else
-				{
-					while(diceBox.getFill() != Color.BLACK)
-					{
-						rollDie(die);
-					}				}
-
-
-			}
-			else if(Dice.getRandomRoll() == Dice.BLUE)
-			{
-				if(blueFound != 4)
-				{
-					die.setDie(Color.BLUE);
-					curRoll = die.getDie();
-					diceBox.setFill(Color.BLACK);
-					playClip("roll.mp3");
-				}
-				else
-				{
-					while(diceBox.getFill() != Color.BLACK)
-					{
-						rollDie(die);
-					}				
-				}
-
-
-			}
-			else if(Dice.getRandomRoll() == Dice.YELLOW)
-			{
-				if(yellowFound != 4)
-				{
-
-					die.setDie(Color.YELLOW);
-					curRoll = die.getDie();
-					diceBox.setFill(Color.BLACK);
-					playClip("roll.mp3");
-				}
-				else
-				{
-					while(diceBox.getFill() != Color.BLACK)
-					{
-						rollDie(die);
-					}
-				}
-
-
-			}
-			else if(Dice.getRandomRoll() == Dice.GREEN)
-			{
-				if(greenFound != 4)
-				{
-					die.setDie(Color.GREEN);
-					curRoll = die.getDie();
-					diceBox.setFill(Color.BLACK);
-					playClip("roll.mp3");
-				}
-				else
-				{
-					while(diceBox.getFill() != Color.BLACK)
-					{
-						rollDie(die);
-					}				
-				}
-
-
-			}
-			else if(Dice.getRandomRoll() == Dice.ORANGE)
-			{
-				if(orangeFound != 4)
-				{
-					die.setDie(Color.ORANGE);
-					curRoll = die.getDie();
-					diceBox.setFill(Color.BLACK);
-					playClip("roll.mp3");
-				}
-				else
-				{
-					while(diceBox.getFill() != Color.BLACK)
-					{
-						rollDie(die);
-					}
-				}
-
-			}
-			else if(Dice.getRandomRoll() == Dice.PURPLE)
-			{
-				if(purpleFound != 4)
-				{
-					die.setDie(Color.MEDIUMPURPLE);
-					curRoll = die.getDie();
-					diceBox.setFill(Color.BLACK);
-					playClip("roll.mp3");
-				}
-				else
-				{
-					while(diceBox.getFill() != Color.BLACK)
-					{
-						rollDie(die);
-					}
-				}
-
-
-			}
-		}
-		else
-		{
-			messageBoard.setText("You need to select a peg now.");
-		}
-		setColorText();
-		diceMessage.setText("Your roll was: " + color);
-		turn = true;
-
-	}
-
-
-
-	public void setDots(String c,Dot d)
-	{
-		if(c == "Red")
-		{
-			player1Red.getChildren().add(d);
-
-		}
-		else if(c == "Yellow")
-		{
-			player1Yellow.getChildren().add(d);
-
-		}
-		else if(c == "Blue")
-		{
-			player1Blue.getChildren().add(d);
-		}
-		else if(c == "Green")
-		{
-			player1Green.getChildren().add(d);
-
-		}
-		else if(c == "Orange")
-		{
-			player1Orange.getChildren().add(d);
-
-		}
-		else if(c == "Purple")
-		{
-			player1Purple.getChildren().add(d);
-		}
-	}
-
-
-	//To roll dice randomly
-	private enum Dice
-	{
-		RED, 
-		BLUE, 
-		YELLOW, 
-		GREEN, 
-		ORANGE,
-		PURPLE;
-
-		public static Dice getRandomRoll() {
-			Random random = new Random();
-			return values()[random.nextInt(values().length)];
-		}
-	}
-
-	// To shuffle the color order
-	public Color[] RandomColor(Color[] array)
-
-	{
-		Random rand = new Random();
-		for(int i=0; i <array.length; i++)
-		{
-			int randomSpot = rand.nextInt(array.length);
-			Color temp = array[i];
-			array[i]= array[randomSpot];
-			array[randomSpot] = temp;
-		}
-
-		return array;
-	}
-
-	public void drawSide1()
-	{
-		Text firstPlayer = new Text("Player 1");
-
-		player1Red = new HBox();
-		player1Blue = new HBox();
-		player1Yellow = new HBox();
-		player1Green = new HBox();
-		player1Orange = new HBox();
-		player1Purple = new HBox();
-
-		player1Red.setSpacing(5);
-		player1Blue.setSpacing(5);
-		player1Yellow.setSpacing(5);
-		player1Green.setSpacing(5);
-		player1Orange.setSpacing(5);
-		player1Purple.setSpacing(5);
-
-		Text redScore = new Text("Red's: ");
-		Text blueScore = new Text("Blue's: ");
-		Text yellowScore = new Text("Yellow's: ");
-		Text greenScore = new Text("Green's: ");
-		Text orangeScore = new Text("Orange's: ");
-		Text pinkScore = new Text("Purple's: ");
-		player1Red.getChildren().add(redScore);
-		player1Blue.getChildren().add(blueScore);
-		player1Yellow.getChildren().add(yellowScore);
-		player1Green.getChildren().add(greenScore);
-		player1Orange.getChildren().add(orangeScore);
-		player1Purple.getChildren().add(pinkScore);
-
-		for(int i = 0; i < 4; i++)
-		{
-			Dot red1 = new Dot(Color.RED);
-			Dot blue1 = new Dot(Color.BLUE);;
-			Dot yellow1 = new Dot(Color.YELLOW);
-			Dot green1 = new Dot(Color.GREEN);
-			Dot orange1 = new Dot(Color.ORANGE);
-			Dot pink1 = new Dot(Color.MEDIUMPURPLE);
-
-			player1Red.getChildren().add(red1);
-			player1Blue.getChildren().add(blue1);;
-			player1Yellow.getChildren().add(yellow1);
-			player1Green.getChildren().add(green1);
-			player1Orange.getChildren().add(orange1);
-			player1Purple.getChildren().add(pink1);
-
-		}
-
-		player1.setPadding(new Insets(70, 12, 15, 12));
-		player1.setSpacing(20);
-		player1.getChildren().addAll(firstPlayer, player1Red, player1Blue, player1Yellow, player1Green, player1Orange, player1Purple);
-		String rights = finds.toString();
-		String wrong = wrongs.toString();
-
-		Text rightFinds = new Text("Found: " + rights);
-		Text misses = new Text("Misses: " + wrong);
-		player1.getChildren().addAll(rightFinds,misses);
-	}
-
+	//Function startGame
+	//Purpose: Starts the game by showing the tops of the pegs for an instant
+	// as well as clearing the scorBoard
+	//Parameters: None
+	//Return: None
 	public void startGame()
 	{				
 		if(musicOn)
@@ -693,7 +413,7 @@ public class memChess extends Application
 			mp.stop();
 			musicOn = false;
 		}
-
+		//Flashes the tops of the pegs so users can have a chance to see it
 		for(Peg p: outie)
 		{
 			p.resetTop();
@@ -731,7 +451,330 @@ public class memChess extends Application
 		player1Orange.getChildren().add(orangeScore);
 		player1Purple.getChildren().add(pinkScore);
 	}
+	//Function dice
+	//Purpose: Sets up the interactive die as well as the box that will change color on click
+	//Parameters: None
+	//Return: None
+	public void dice()
+	{
+		diceBox = new Rectangle(100,100);
+		diceBox.setStroke(Color.BLACK);
+		diceBox.setStrokeWidth(3);
+		diceBox.setFill(Color.FLORALWHITE);
+		Die die = new Die();
+		die.addEventHandler
+		(  MouseEvent.MOUSE_CLICKED,
+				(MouseEvent m )->
+		{
+			if(gameOn)
+			{
+				rollDie(die);
+			}
 
+		});
+		StackPane.setAlignment(diceBox, Pos.TOP_RIGHT);
+		StackPane.setAlignment(die, Pos.TOP_RIGHT);
+
+		Text rollHere = new Text("Click the die to roll\n   (or press 'Enter')");
+		rollHere.setTranslateX(-3);
+		rollHere.setTranslateY(105);
+		rollHere.setFont(Font.font("Verdana", FontWeight.BOLD, 9.5));
+		StackPane.setAlignment(rollHere, Pos.TOP_RIGHT);
+
+		board.getChildren().addAll(diceBox, die, rollHere);
+		scene.setOnKeyPressed
+		(  (KeyEvent ke) -> 
+		{
+			if(gameOn)
+			{
+				if (ke.getCode().equals(KeyCode.ENTER))
+				{
+					rollDie(die);
+				}
+			}
+
+		} 
+				);
+	}
+	//Function roleDie
+	//Purpose: Roles the die randomly while checking to see if that color has anymore pegs on the board
+	//Parameters: Die
+	//Return: None
+	public void rollDie(Die die)
+	{
+		//Checks the backgrond of the die box first to proceed
+		if(diceBox.getFill() != Color.BLACK)
+		{
+			//Rolls the die and gets the color
+			if(Dice.getRandomRoll() == Dice.RED)
+			{
+				//if there is a peg remaining proceed
+				if(redFound != 4)
+				{
+					die.setDie(Color.RED);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
+				}
+				//else keeping rolling behind the scenes until an available peg
+				else
+				{
+					while(diceBox.getFill() != Color.BLACK)
+					{
+						rollDie(die);
+					}				}
+
+
+			}
+			else if(Dice.getRandomRoll() == Dice.BLUE)
+			{
+				//if there is a peg remaining proceed
+				if(blueFound != 4)
+				{
+					die.setDie(Color.BLUE);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
+				}
+				//else keeping rolling behind the scenes until an available peg
+				else
+				{
+					while(diceBox.getFill() != Color.BLACK)
+					{
+						rollDie(die);
+					}				
+				}
+
+
+			}
+			else if(Dice.getRandomRoll() == Dice.YELLOW)
+			{
+				//if there is a peg remaining proceed
+				if(yellowFound != 4)
+				{
+
+					die.setDie(Color.YELLOW);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
+				}
+				//else keeping rolling behind the scenes until an available peg
+				else
+				{
+					while(diceBox.getFill() != Color.BLACK)
+					{
+						rollDie(die);
+					}
+				}
+
+
+			}
+			else if(Dice.getRandomRoll() == Dice.GREEN)
+			{
+				//if there is a peg remaining proceed
+				if(greenFound != 4)
+				{
+					die.setDie(Color.GREEN);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
+				}
+				//else keeping rolling behind the scenes until an available peg
+				else
+				{
+					while(diceBox.getFill() != Color.BLACK)
+					{
+						rollDie(die);
+					}				
+				}
+
+
+			}
+			else if(Dice.getRandomRoll() == Dice.ORANGE)
+			{
+				//if there is a peg remaining proceed
+				if(orangeFound != 4)
+				{
+					die.setDie(Color.ORANGE);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
+				}
+				//else keeping rolling behind the scenes until an available peg
+				else
+				{
+					while(diceBox.getFill() != Color.BLACK)
+					{
+						rollDie(die);
+					}
+				}
+
+			}
+			else if(Dice.getRandomRoll() == Dice.PURPLE)
+			{
+				//if there is a peg remaining proceed
+				if(purpleFound != 4)
+				{
+					die.setDie(Color.MEDIUMPURPLE);
+					curRoll = die.getDie();
+					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
+				}
+				//else keeping rolling behind the scenes until an available peg
+				else
+				{
+					while(diceBox.getFill() != Color.BLACK)
+					{
+						rollDie(die);
+					}
+				}
+
+
+			}
+		}
+		else
+		{
+			messageBoard.setText("You need to select a peg now.");
+		}
+		setColorText();
+		diceMessage.setText("Your roll was: " + color);
+		turn = true;
+
+	}
+	//Function setDots
+	//Purpose: Sets the dot to the appropriate HBox on the side
+	//Parameters: A string of what color it is and the Dot assiosciated with it
+	//Return: None
+	public void setDots(String c,Dot d)
+	{
+		if(c == "Red")
+		{
+			player1Red.getChildren().add(d);
+
+		}
+		else if(c == "Yellow")
+		{
+			player1Yellow.getChildren().add(d);
+
+		}
+		else if(c == "Blue")
+		{
+			player1Blue.getChildren().add(d);
+		}
+		else if(c == "Green")
+		{
+			player1Green.getChildren().add(d);
+
+		}
+		else if(c == "Orange")
+		{
+			player1Orange.getChildren().add(d);
+
+		}
+		else if(c == "Purple")
+		{
+			player1Purple.getChildren().add(d);
+		}
+	}
+	//To roll dice randomly Enum
+	private enum Dice
+	{
+		RED, 
+		BLUE, 
+		YELLOW, 
+		GREEN, 
+		ORANGE,
+		PURPLE;
+
+		public static Dice getRandomRoll() {
+			Random random = new Random();
+			return values()[random.nextInt(values().length)];
+		}
+	}
+	//Function RandomColor
+	//Purpose: Ranomizes the array of colors so I can add them to the board in no order
+	//Parameters: An array of colors
+	//Return: An array of colors
+	public Color[] RandomColor(Color[] array)
+	{
+		Random rand = new Random();
+		for(int i=0; i <array.length; i++)
+		{
+			int randomSpot = rand.nextInt(array.length);
+			Color temp = array[i];
+			array[i]= array[randomSpot];
+			array[randomSpot] = temp;
+		}
+
+		return array;
+	}
+	//Function drawSide1
+	//Purpose: Draws the left side with the scored board also with how the game will look in the end
+	//Parameters:None
+	//Return: None
+	public void drawSide1()
+	{
+		Text scoreBoard = new Text("Score Board");
+
+		player1Red = new HBox();
+		player1Blue = new HBox();
+		player1Yellow = new HBox();
+		player1Green = new HBox();
+		player1Orange = new HBox();
+		player1Purple = new HBox();
+
+		player1Red.setSpacing(5);
+		player1Blue.setSpacing(5);
+		player1Yellow.setSpacing(5);
+		player1Green.setSpacing(5);
+		player1Orange.setSpacing(5);
+		player1Purple.setSpacing(5);
+
+		Text redScore = new Text("Red's: ");
+		Text blueScore = new Text("Blue's: ");
+		Text yellowScore = new Text("Yellow's: ");
+		Text greenScore = new Text("Green's: ");
+		Text orangeScore = new Text("Orange's: ");
+		Text pinkScore = new Text("Purple's: ");
+		player1Red.getChildren().add(redScore);
+		player1Blue.getChildren().add(blueScore);
+		player1Yellow.getChildren().add(yellowScore);
+		player1Green.getChildren().add(greenScore);
+		player1Orange.getChildren().add(orangeScore);
+		player1Purple.getChildren().add(pinkScore);
+		//Assigns all of  the dots initially
+		for(int i = 0; i < 4; i++)
+		{
+			Dot red1 = new Dot(Color.RED);
+			Dot blue1 = new Dot(Color.BLUE);;
+			Dot yellow1 = new Dot(Color.YELLOW);
+			Dot green1 = new Dot(Color.GREEN);
+			Dot orange1 = new Dot(Color.ORANGE);
+			Dot pink1 = new Dot(Color.MEDIUMPURPLE);
+
+			player1Red.getChildren().add(red1);
+			player1Blue.getChildren().add(blue1);;
+			player1Yellow.getChildren().add(yellow1);
+			player1Green.getChildren().add(green1);
+			player1Orange.getChildren().add(orange1);
+			player1Purple.getChildren().add(pink1);
+
+		}
+
+		player1.setPadding(new Insets(70, 12, 15, 12));
+		player1.setSpacing(20);
+		player1.getChildren().addAll(scoreBoard, player1Red, player1Blue, player1Yellow, player1Green, player1Orange, player1Purple);
+		String rights = finds.toString();
+		String wrong = wrongs.toString();
+
+		Text rightFinds = new Text("Found: " + rights);
+		Text misses = new Text("Misses: " + wrong);
+		player1.getChildren().addAll(rightFinds,misses);
+	}
+	//Function updateScore
+	//Purpose: Removes the old score and updates it with the new score
+	//Parameters: None
+	//Return: None
 	public void updateScore()
 	{
 		player1.getChildren().remove(8);
@@ -744,46 +787,45 @@ public class memChess extends Application
 		player1.getChildren().addAll(rightFinds,misses);
 
 	}
-
+	//Function foundColor
+	//Purpose: Updates the count of pegs of a certian color found so the die doesnt need to be rolled forever
+	//Parameters: String of what color it is
+	//Return: None
 	public void  foundColor(String c)
 	{
 		if(c == "Red")
 		{
 			redFound++;
-			System.out.println("Red=" + redFound);
 		}
 		else if(c == "Yellow")
 		{
 			yellowFound++;
-			System.out.println("Yellow=" + yellowFound);
 		}
 		else if(c == "Blue")
 		{
 			blueFound++;
-			System.out.println("Blue=" + blueFound);
 		}
 		else if(c == "Green")
 		{
 			greenFound++;
-			System.out.println("Green=" + greenFound);
 
 		}
 		else if(c == "Orange")
 		{
 			orangeFound++;
-			System.out.println("Orange=" + orangeFound);
-
 		}
 		else if(c == "Purple")
 		{
 			purpleFound++;
-			System.out.println("Purple=" + purpleFound);
 		}
 	}
-
+	//Function drawSide2
+	//Purpose: Sets up the rules and hides them for the user to toggle
+	//Parameters:None
+	//Return: None
 	public void drawSide2()
 	{
-		Text secondPlayer = new Text("Rules");
+		Text rulesTitle = new Text("Rules");
 		Text rulesParagraph = new Text("Welcome to your "
 				+ "\nbrain game."
 				+ "\nThis is a memory game "
@@ -818,13 +860,13 @@ public class memChess extends Application
 		rulesParagraph.setFont(Font.font("Verdana", 12));
 		player2.setPadding(new Insets(70, 12, 15, 12));
 		player2.setSpacing(20);
-		player2.getChildren().addAll(secondPlayer, rulesParagraph);
+		player2.getChildren().addAll(rulesTitle, rulesParagraph);
 		player2.setVisible(false);
 
 	}
 
 
-
+	//Class dot with the purpose of creating a similar dot to append on the side so players can keep track of the pegs they found
 	public class Dot extends Circle
 	{
 
@@ -838,9 +880,7 @@ public class memChess extends Application
 		}
 
 	}
-
-
-
+	//Class Die with the purpose of setting up a die that will change and hold the color of the die
 	public class Die extends Group
 	{
 		Color cur = Color.YELLOW;
@@ -882,6 +922,7 @@ public class memChess extends Application
 
 
 	}
+	//Animation driver for moving the Pegs
 	public class Driver extends AnimationTimer
 	{
 		@Override
