@@ -1,6 +1,6 @@
 package finalProject;
 
-import java.util.Iterator;
+import java.io.File;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -13,6 +13,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
@@ -31,17 +34,11 @@ public class memChess extends Application
 	VBox player1;//Left side
 	VBox player2;//Right side
 	HBox player1Red;//Stores the selected pegs in an ordered position-- Might change to something more efficent
-	HBox player2Red;//Stores the selected pegs in an ordered position
 	HBox player1Blue;//Stores the selected pegs in an ordered position
-	HBox player2Blue;//Stores the selected pegs in an ordered position
 	HBox player1Yellow;//Stores the selected pegs in an ordered position
-	HBox player2Yellow;//Stores the selected pegs in an ordered position
 	HBox player1Green;//Stores the selected pegs in an ordered position
-	HBox player2Green;//Stores the selected pegs in an ordered position
 	HBox player1Orange;//Stores the selected pegs in an ordered position
-	HBox player2Orange;//Stores the selected pegs in an ordered position
 	HBox player1Purple;//Stores the selected pegs in an ordered position
-	HBox player2Pink;//Stores the selected pegs in an ordered position
 	StackPane board;//Board where pegs are
 	Color curRoll;// To store current roll to check against peg
 	Rectangle diceBox;
@@ -61,6 +58,8 @@ public class memChess extends Application
 	int purpleFound;
 	boolean turn;
 	boolean gameOn;
+	boolean musicOn = false;
+	MediaPlayer mp;
 
 
 	public static void main( String[] args )
@@ -88,7 +87,6 @@ public class memChess extends Application
 		diceMessage.setFont(Font.font("Verdana", FontWeight.BOLD, 18));
 		lasttime = 0;
 		gameOn = false;
-		//Working on for rolloing dice with enter
 
 		setUp();
 		drive = new Driver();
@@ -181,7 +179,7 @@ public class memChess extends Application
 							spot.setSpot(c);
 							if(c == curRoll)
 							{
-								System.out.println("found one");
+
 								messageBoard.setText("You selected a " + spot.getColor() + " peg: Correct!");
 								spot.setFound(true);
 								finds++;
@@ -190,10 +188,15 @@ public class memChess extends Application
 								foundColor(spot.getColor());
 								Dot dot = new Dot(c);
 								setDots(spot.getColor(), dot);
+								playClip("chime.mp3");
+								if(finds == 24)
+								{
+									gameOver();
+								}
 							}
 							else
 							{
-								System.out.println("Nope");
+								playClip("wrong.mp3");
 								messageBoard.setText("You selected a " + spot.getColor() + " peg: Incorrect :(");
 								spot.resetTop();
 								wrongs++;
@@ -223,6 +226,47 @@ public class memChess extends Application
 
 		extraControls();
 
+	}
+
+	public void gameOver()
+	{
+
+		gameOn =false;
+		for(Peg p: outie)
+		{
+			p.lastCall();
+		}
+		for(Peg p: innie)
+		{
+			p.lastCall();
+		}
+		messageBoard.setText("Congratulations! You have won! Play Again?");
+
+		playAudio("trial.mp3");
+		musicOn = true;
+	}
+
+
+	public void playAudio(String f)
+	{
+		File fsFile = new File( f );
+		String rh = fsFile.toURI().toString();
+		Media m = new Media( rh );
+		mp = new MediaPlayer(m);
+		mp.setVolume(0.5);
+
+		mp.play();
+	}
+
+	public void playClip(String c)
+	{
+		File clip = new File(c);
+		String rH = clip.toURI().toString();
+		System.out.println("reallyHere="+rH);
+		AudioClip soundClip = new AudioClip(rH);
+		soundClip.setVolume(0.7);
+
+		soundClip.play(); 
 	}
 
 
@@ -318,7 +362,7 @@ public class memChess extends Application
 			}
 		});
 		Button multi = new Button("Game Rules");
-		
+
 		multi.addEventHandler
 		(  MouseEvent.MOUSE_CLICKED,
 				(MouseEvent m )->
@@ -398,10 +442,11 @@ public class memChess extends Application
 					die.setDie(Color.RED);
 					curRoll = die.getDie();
 					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
 				}
 				else
 				{
-					while(diceBox.getFill() != Color.RED)
+					while(diceBox.getFill() != Color.BLACK)
 					{
 						rollDie(die);
 					}				}
@@ -415,10 +460,11 @@ public class memChess extends Application
 					die.setDie(Color.BLUE);
 					curRoll = die.getDie();
 					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
 				}
 				else
 				{
-					while(diceBox.getFill() != Color.RED)
+					while(diceBox.getFill() != Color.BLACK)
 					{
 						rollDie(die);
 					}				
@@ -434,10 +480,11 @@ public class memChess extends Application
 					die.setDie(Color.YELLOW);
 					curRoll = die.getDie();
 					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
 				}
 				else
 				{
-					while(diceBox.getFill() != Color.RED)
+					while(diceBox.getFill() != Color.BLACK)
 					{
 						rollDie(die);
 					}
@@ -452,10 +499,11 @@ public class memChess extends Application
 					die.setDie(Color.GREEN);
 					curRoll = die.getDie();
 					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
 				}
 				else
 				{
-					while(diceBox.getFill() != Color.RED)
+					while(diceBox.getFill() != Color.BLACK)
 					{
 						rollDie(die);
 					}				
@@ -470,10 +518,11 @@ public class memChess extends Application
 					die.setDie(Color.ORANGE);
 					curRoll = die.getDie();
 					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
 				}
 				else
 				{
-					while(diceBox.getFill() != Color.RED)
+					while(diceBox.getFill() != Color.BLACK)
 					{
 						rollDie(die);
 					}
@@ -487,10 +536,11 @@ public class memChess extends Application
 					die.setDie(Color.MEDIUMPURPLE);
 					curRoll = die.getDie();
 					diceBox.setFill(Color.BLACK);
+					playClip("roll.mp3");
 				}
 				else
 				{
-					while(diceBox.getFill() != Color.RED)
+					while(diceBox.getFill() != Color.BLACK)
 					{
 						rollDie(die);
 					}
@@ -501,7 +551,7 @@ public class memChess extends Application
 		}
 		else
 		{
-			System.out.println("Need to select a peg now");
+			messageBoard.setText("You need to select a peg now.");
 		}
 		setColorText();
 		diceMessage.setText("Your roll was: " + color);
@@ -638,6 +688,12 @@ public class memChess extends Application
 
 	public void startGame()
 	{				
+		if(musicOn)
+		{		
+			mp.stop();
+			musicOn = false;
+		}
+
 		for(Peg p: outie)
 		{
 			p.resetTop();
@@ -826,8 +882,6 @@ public class memChess extends Application
 
 
 	}
-
-	//Created for hard mode when I get there
 	public class Driver extends AnimationTimer
 	{
 		@Override
